@@ -18,11 +18,11 @@ def md5_encode(text):
 
 
 # MySQL 配置
-MYSQL_HOST = '159.75.50.79'
+MYSQL_HOST = '127.0.0.1'
 MYSQL_PORT = 3306
-MYSQL_USER = 'vul'
+MYSQL_USER = 'root'
 MYSQL_PASSWORD = '123456'
-MYSQL_DB = 'vul'
+MYSQL_DB = 'pearadminflask'
 
 
 # 创建 MySQL 连接

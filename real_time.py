@@ -5,9 +5,9 @@ import pymysql
 import datetime
 import time
 def data2mysql(data):
-    cnx = pymysql.connect(user='vul', password='123456',
-                                host='159.75.50.79',
-                                database='vul', port=3306)
+    cnx = pymysql.connect(user='root', password='123456',
+                                host='127.0.0.1',
+                                database='pearadminflask', port=3306)
 
     cursor = cnx.cursor()
     
