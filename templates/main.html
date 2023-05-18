@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>可视化系统</title>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: rgba(225, 227, 227, 0.49);
+        }
+
+        .topDiv {
+            background-color: black;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 50px;
+            padding: 0 20px;
+        }
+
+        .rightDiv {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        #exit {
+            margin-left: 20px;
+            color: #999999;
+            font-size: 12px;
+            cursor: grab;
+        }
+
+        .contentDiv {
+            display: flex;
+        {#justify-content: space-between;#}
+        }
+
+        .menu {
+            height: calc(100vh - 60px);
+            width: 10%;
+            background-color: #20365e;
+        }
+
+        .oneMenu {
+            color: #ffffff;
+            padding: 20px 20px;
+            cursor: grab;
+        }
+
+        .oneMenuSel {
+        {#background-color: #4d76b9;#} color: #39d7f3;
+        }
+
+        .iframeDiv {
+            margin-left: 1%;
+            width: 89%;
+
+        }
+    </style>
+</head>
+<body>
+<div class="topDiv">
+    <div>vulnerability报表后台</div>
+    <div class="rightDiv">
+        <div id="name"></div>
+        <div id="exit">退出登录</div>
+    </div>
+</div>
+
+<div class="contentDiv">
+    <div class="menu">
+        <div class='oneMenu oneMenuSel' tem='report'>可视化报表</div>
+        <div class='oneMenu adminMenu' tem='dataList'>数据管理</div>
+        <div class='oneMenu adminMenu' tem='userList'>用户列表</div>
+    </div>
+    <div class="iframeDiv">
+        <iframe src="/report" id="iframe1" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script>
+    var name = localStorage.getItem("name");
+    var token = localStorage.getItem("token");
+    var admin = localStorage.getItem("admin");
+    if (name == "" || name == "null") {
+        alert("请重新登录");
+        window.location.href = "/";
+    } else {
+        //展示账号
+        $("#name").html(localStorage.getItem("name"));
+        if (admin != 1) {
+            $(".adminMenu").hide();
+        }
+    }
+
+    $("#exit").on('click', function () {
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+        localStorage.removeItem("admin");
+        window.location.href = "/";
+    })
+
+    $(document).on('click', '.oneMenu', function () {
+        var src = $(this).attr('tem');
+        $("#iframe1").attr('src', src);
+        $(".oneMenuSel").removeClass("oneMenuSel");
+        $(this).addClass("oneMenuSel");
+    })
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <style>
+        table {
+            width: 100%;
+            font-size: 12px;
+            background-color: white;
+            border-bottom: 1px solid lightgray;
+            border-collapse: collapse;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        tr:hover {
+            background-color: rgb(242, 242, 242);
+        }
+
+        th {
+            border-bottom: 1px solid lightgray;
+        }
+
+        td {
+            border-bottom: 1px solid lightgray;
+        {#width: 200px !important;#} text-align: center;
+            line-height: 40px;
+            height: 40px;
+            padding: 4px 10px;
+        }
+
+        .searchDiv {
+            background-color: white;
+            font-size: 12px;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        input[type='text'] {
+            height: 27px;
+            margin-left: 10px;
+            margin-right: 10px;
+            border-color: rgba(153, 153, 153, 0.11);
+            border-radius: 4px;
+        }
+
+        input[type='button'] {
+            border-color: transparent;
+            padding: 6px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        input[type='checkbox'] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #page {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            padding: 10px;
+        }
+
+        .pageDiv {
+            margin: 6px;
+            border: 1px solid rgba(153, 153, 153, 0.65);
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .selected {
+            color: #ffffff;
+            background: #4672ff;
+            cursor: default;
+        }
+
+        .zhezhao {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #00000020;
+            top: 0px;
+            left: 0px;
+            display: none;
+        }
+
+        .valDiv {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+        {#height: 80%;#} background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div>
+    <div class="searchDiv">
+        <div>CNNVD：</div>
+        <input id="cnnvdTxt" type="text" style="">
+
+        <div>发布日期：</div>
+        <input id="time1" class="inputTime" type="text" style="">至<input id="time2" class="inputTime" type="text"
+                                                                          style="">
+        <input type="button" value="搜索" style="background-color: rgb(10,190,150);border-radius: 10px;"
+               onclick="toPage(1)"/>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <input id="addBtn" type="button" value="手动添加" style="background-color: rgb(90,180,130);"/>
+        <input id="plDelBtn" type="button" value="批量删除" style="background-color: rgb(250,150,150);"/>
+    </div>
+
+    <table>
+        <tr style="background-color: rgba(153,153,153,0.6);color:#ffffff;">
+            <td nowrap>ID</td>
+            <td nowrap>CNNVD</td>
+            <td nowrap>危害等级</td>
+            <td nowrap>CVE编号</td>
+            <td nowrap>漏洞类型</td>
+            <td nowrap>发布时间</td>
+            <td nowrap>威胁类型</td>
+            <td nowrap>更新时间</td>
+            <td nowrap>厂商</td>
+            <td nowrap>漏洞来源</td>
+            {#            <td nowrap>漏洞公告</td>#}
+            {#            <td nowrap>参考网址</td>#}
+            <td nowrap>受影响实体</td>
+            {#            <td nowrap>补丁</td>#}
+            <td nowrap>操作</td>
+        </tr>
+        <tr id="trVal"></tr>
+
+    </table>
+
+    <div id="page"></div>
+</div>
+
+
+<div id="detailDiv" class="zhezhao">
+    <div id="detailDiv2" class="valDiv">
+        <table>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">ID:</td>
+                <td id="td_id"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">CNNVD:</td>
+                <td id="td_CNNVD"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">危害等级:</td>
+                <td id="td_危害等级"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">CVE编号:</td>
+                <td id="td_CVE编号"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞类型:</td>
+                <td id="td_漏洞类型"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">发布时间:</td>
+                <td id="td_发布时间"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">威胁类型:</td>
+                <td id="td_威胁类型"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">更新时间:</td>
+                <td id="td_更新时间"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">厂商:</td>
+                <td id="td_厂商"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞来源:</td>
+                <td id="td_漏洞来源"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞公告:</td>
+                <td id="td_漏洞公告" colspan="3"></td>
+
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">参考网址:</td>
+                <td id="td_参考网址" colspan="3"></td>
+
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">受影响实体:</td>
+                <td id="td_受影响实体"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">补丁:</td>
+                <td id="td_补丁"></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <input id="closeDetailDiv" type="button" value="关闭" style="background-color: #999999"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div id="editDiv" class="zhezhao">
+    <div id="editDiv2" class="valDiv">
+        <table>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">ID:</td>
+                <td style="text-align: left;"><input id="id" type="text" placeholder="新增不需要填"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">CNNVD:</td>
+                <td style="text-align: left;"><input id="CNNVD" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">危害等级:</td>
+                <td style="text-align: left;"><input id="危害等级" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">CVE编号:</td>
+                <td style="text-align: left;"><input id="CVE编号" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞类型:</td>
+                <td style="text-align: left;"><input id="漏洞类型" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">发布时间:</td>
+                <td style="text-align: left;"><input id="发布时间" class="inputTime" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">威胁类型:</td>
+                <td style="text-align: left;"><input id="威胁类型" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">更新时间:</td>
+                <td style="text-align: left;"><input id="更新时间" class="inputTime" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">厂商:</td>
+                <td style="text-align: left;"><input id="厂商" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞来源:</td>
+                <td style="text-align: left;"><input id="漏洞来源" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">漏洞公告:</td>
+                <td style="text-align: left;" colspan="3"><input id="漏洞公告" type="text" style="width: 1000px;"/></td>
+
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">参考网址:</td>
+                <td style="text-align: left;" colspan="3"><input id="参考网址" type="text" style="width: 1000px;"/></td>
+
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">受影响实体:</td>
+                <td style="text-align: left;"><input id="受影响实体" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">补丁:</td>
+                <td style="text-align: left;"><input id="补丁" type="text"/></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <input id="editBtn" type="button" value="修改" style="background-color: rgb(22,130,160);"/>
+                    <input id="closeEditDiv" type="button" value="关闭" style="background-color: #999999"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $(".inputTime").datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+        toPage(1);
+    });
+
+    function setPage(page, pageSize, count) {
+        //总记录数大于pageSize的时候显示分页
+        if (count > pageSize) {
+            var html = "";
+            // 首页设置
+            if (page > 1) {
+                if (count / pageSize > 2) {
+                    html += "<div class='pageDiv' onclick='toPage(1)'>首页</div>";
+                }
+                html += "<div class='pageDiv' onclick='toPage(" + (page - 1) + ")'>上一页</div>";
+            }
+            // 当前页
+            html += "<div class='pageDiv selected'>" + page + "</div>";
+            // 后pageSize页
+            for (var i = page + 1, h = 1; i - 1 < count / pageSize && h < pageSize; i++, h++) {
+                html += "<div class='pageDiv' onclick='toPage(" + i + ")'>" + i + "</div>";
+            }
+            //尾页设置
+            if (page < count / pageSize) {
+                var lastPage = parseInt(count / pageSize) + 1;
+                html += "<div class='pageDiv' onclick='toPage(" + lastPage + ")'>尾页</div>";
+            }
+            $("#page").html(html);
+        } else {
+            $("#page").html("<div class='pageDiv selected'>1</div>");
+        }
+        $("#page").html($("#page").html() + "<div class='pageDiv'>每页 " + pageSize + " 行,共 " + count + " 行</div>");
+    }
+
+    function toPage(page) {
+        var cnnvd = $("#cnnvdTxt").val();
+        var time1 = $("#time1").val();
+        var time2 = $("#time2").val();
+        var pageSize = 12;
+        $.post("/getDataList", {
+            cnnvd: cnnvd, time1: time1, time2: time2, page: page, pageSize: pageSize
+        }, (res) => {
+            console.log(res);
+
+            $(".trOrther").remove();
+            for (var i = 0; i < res.data.list.length; i++) {
+                var one = res.data.list[i];
+
+                html = ' <tr class="trOrther">' +
+                    '<td nowrap>' +
+                    '<input id="ids" name="ids" type="checkbox" value="' + one.id + '"/>' + one.id + '</td>' +
+                    '<td nowrap>' + one.CNNVD + '</td>' +
+                    '<td nowrap>' + one.危害等级 + '</td>' +
+                    '<td nowrap>' + one.CVE编号 + '</td>' +
+                    '<td nowrap>' + one.漏洞类型 + '</td>' +
+                    '<td nowrap>' + one.发布时间 + '</td>' +
+                    '<td nowrap>' + one.威胁类型 + '</td>' +
+                    '<td nowrap>' + one.更新时间 + '</td>' +
+                    '<td nowrap>' + one.厂商 + '</td>' +
+                    '<td nowrap>' + one.漏洞来源 + '</td> ' +
+                    '<td nowrap>' + one.受影响实体 + '</td>' +
+                    '<td>' +
+                    '  <input onclick="detail(' + one.id + ')" type="button" value="详情" style="background-color: rgb(0,209,190);"/>' +
+                    '  <input onclick="edit(' + one.id + ')" type="button" value="修改" style="background-color: rgb(22,130,160);"/>' +
+                    '  <input onclick="deleteFun(' + one.id + ')" type="button" value="删除" style="background-color: rgb(250,150,150);"/>' +
+                    '</td>' +
+                    '</tr>';
+
+                $("#trVal").before(html);
+            }
+
+            setPage(res.data.page, pageSize, res.data.count);
+        }, "json")
+    }
+
+    $("#plDelBtn").on('click', function () {
+        var ids = "";
+        $("input[name='ids']:checked").each(function () {
+            ids += "," + $(this).val();
+        });
+        if (ids != "") {
+            ids = ids.substring(1);
+        }
+        deleteFun(ids);
+    });
+
+
+    function deleteFun(ids) {
+        if (ids == "") {
+            alert("请选择记录");
+            return;
+        }
+        if (confirm("确定要删除？")) {
+            $.post("/delData", {ids: ids}, (res) => {
+                alert("删除成功");
+                toPage(1);
+            }, "json");
+        }
+    }
+
+    $("#addBtn").on('click', function () {
+        $("#editDiv").show();
+        $("#id").val("");
+        $("#CNNVD").val("");
+        $("#危害等级").val("");
+        $("#CVE编号").val("");
+        $("#漏洞类型").val("");
+        $("#发布时间").val("");
+        $("#威胁类型").val("");
+        $("#更新时间").val("");
+        $("#厂商").val("");
+        $("#漏洞来源").val("");
+        $("#漏洞公告").val("");
+        $("#参考网址").val("");
+        $("#受影响实体").val("");
+        $("#补丁").val("");
+        $("#editBtn").val("新增")
+    });
+
+    function edit(id) {
+        $("#editDiv").show();
+        $.post("/getData", {id: id}, (res) => {
+            console.log(res);
+            var one = res.data;
+            $("#id").val(one.id);
+            $("#CNNVD").val(one.CNNVD);
+            $("#危害等级").val(one.危害等级);
+            $("#CVE编号").val(one.CVE编号);
+            $("#漏洞类型").val(one.漏洞类型);
+            $("#发布时间").val(one.发布时间);
+            $("#威胁类型").val(one.威胁类型);
+            $("#更新时间").val(one.更新时间);
+            $("#厂商").val(one.厂商);
+            $("#漏洞来源").val(one.漏洞来源);
+            $("#漏洞公告").val(one.漏洞公告);
+            $("#参考网址").val(one.参考网址);
+            $("#受影响实体").val(one.受影响实体);
+            $("#补丁").val(one.补丁);
+            $("#editBtn").val("修改")
+        }, "json");
+    }
+
+    $("#editBtn").on('click', function () {
+        var id = $("#id").val();
+        var CNNVD = $("#CNNVD").val();
+        var 危害等级 = $("#危害等级").val();
+        var CVE编号 = $("#CVE编号").val();
+        var 漏洞类型 = $("#漏洞类型").val();
+        var 发布时间 = $("#发布时间").val();
+        var 威胁类型 = $("#威胁类型").val();
+        var 更新时间 = $("#更新时间").val();
+        var 厂商 = $("#厂商").val();
+        var 漏洞来源 = $("#漏洞来源").val();
+        var 漏洞公告 = $("#漏洞公告").val();
+        var 参考网址 = $("#参考网址").val();
+        var 受影响实体 = $("#受影响实体").val();
+        var 补丁 = $("#补丁").val();
+        if (id == "") {
+            id = 0;
+        }
+        $.post("/addOrEditData", {
+                id: id,
+                CNNVD: CNNVD,
+                危害等级: 危害等级,
+                CVE编号: CVE编号,
+                漏洞类型: 漏洞类型,
+                发布时间: 发布时间,
+                威胁类型: 威胁类型,
+                更新时间: 更新时间,
+                厂商: 厂商,
+                漏洞来源: 漏洞来源,
+                漏洞公告: 漏洞公告,
+                参考网址: 参考网址,
+                受影响实体: 受影响实体,
+                补丁: 补丁
+            }, (res) => {
+                if (id > 0) {
+                    alert("修改成功");
+                } else {
+                    alert("新增成功");
+                }
+                toPage(1);
+                $("#editDiv").hide();
+            }, "json"
+        );
+    });
+
+    $("#closeEditDiv").on('click', function () {
+        $("#editDiv").hide();
+    });
+
+    function detail(id) {
+        $("#detailDiv").show();
+        $.post("/getData", {id: id}, (res) => {
+            console.log(res);
+            var one = res.data;
+            $("#td_id").html(one.id);
+            $("#td_CNNVD").html(one.CNNVD);
+            $("#td_危害等级").html(one.危害等级);
+            $("#td_CVE编号").html(one.CVE编号);
+            $("#td_漏洞类型").html(one.漏洞类型);
+            $("#td_发布时间").html(one.发布时间);
+            $("#td_威胁类型").html(one.威胁类型);
+            $("#td_更新时间").html(one.更新时间);
+            $("#td_厂商").html(one.厂商);
+            $("#td_漏洞来源").html(one.漏洞来源);
+            $("#td_漏洞公告").html(one.漏洞公告);
+            $("#td_参考网址").html(one.参考网址);
+            $("#td_受影响实体").html(one.受影响实体);
+            $("#td_补丁").html(one.补丁);
+        }, "json");
+    }
+
+    $("#closeDetailDiv").on('click', function () {
+        $("#detailDiv").hide();
+    });
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <style>
+        body {
+            background-image: url("/static/image/1.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+
+<div style="margin-top:200px;width: 100%; display: flex;justify-content: center;">
+    <div style="width: 600px;height: 400px;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);border-radius: 10px;background-color: white;">
+        <div style="margin: 40px;font-size: 20px">如您已经注册，可以直接点击登录：</div>
+        <div style="margin: 40px;font-size: 16px">
+            账号：
+            <input id="name" type="text" value="" placeholder="请输入账号"
+                   style="border-color: transparent; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);width: 60%;height: 30px;border-radius: 10px;padding: 4px;"/>
+        </div>
+        <div style="margin: 40px;font-size: 16px">
+            密码：
+            <input id="password" type="password" value="" placeholder="请输入密码"
+                   style="border-color: transparent;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);width: 60%;height: 30px;border-radius: 10px;padding: 4px;"/>
+        </div>
+        <div style="margin: 40px;font-size: 16px">
+            <input id="loginBtn" type="button" value="登录"
+                   style="color:#ffffff;background-color: blueviolet;width: 100px;height: 40px;border-color: blueviolet;border-radius: 10px;"/>
+            <a href="/reg" style="margin-left: 40px;color:#999999;">注册账号</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $("#loginBtn").on("click", function () {
+        $.post('/login', {name: $("#name").val(), password: $("#password").val()}, function (res) {
+            console.log(res);
+            if (res.code == 200) {
+                // alert('登录成功');
+                localStorage.setItem('name', $("#name").val());
+                localStorage.setItem('token', res.token);
+                localStorage.setItem('admin', res.admin);
+                window.location.href = "/main"
+            } else {
+                alert('登录失败，请确认账号密码');
+            }
+        }, "json")
+    });
+</script>
+</body>
+</html>

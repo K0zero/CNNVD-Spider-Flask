@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册新账号</title>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <style>
+        body {
+            background-image: url("/static/image/2.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+
+<div style="margin-top:200px;width: 100%; display: flex;justify-content: center;">
+    <div style="width: 600px;height: 400px;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);border-radius: 10px;background-color: white;">
+        <div style="margin: 40px;font-size: 20px">请输入您想注册的账号、密码和手机：</div>
+        <div style="margin: 40px;font-size: 16px">
+            账号：
+            <input id="name" type="text" value="" placeholder="请输入账号"
+                   style="border-color: transparent; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);width: 60%;height: 30px;border-radius: 10px;padding: 4px;"/>
+        </div>
+        <div style="margin: 40px;font-size: 16px">
+            密码：
+            <input id="password" type="text" value="" placeholder="请输入密码"
+                   style="border-color: transparent;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);width: 60%;height: 30px;border-radius: 10px;padding: 4px;"/>
+        </div>
+        <div style="margin: 40px;font-size: 16px">
+            手机：
+            <input id="phone" type="text" value="" placeholder="请输入手机"
+                   style="border-color: transparent;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);width: 60%;height: 30px;border-radius: 10px;padding: 4px;"/>
+        </div>
+        <div style="margin: 40px;font-size: 16px">
+            <input id="loginBtn" type="button" value="注册"
+                   style="color:#ffffff;background-color: blueviolet;width: 100px;height: 40px;border-color: blueviolet;border-radius: 10px;"/>
+            <a href="/" style="margin-left: 40px;color:#999999;">返回首页</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $("#loginBtn").on("click", function () {
+        if ($("#name").val() == "") {
+            alert("姓名不能为空");
+            return;
+        }
+        if ($("#password").val() == "") {
+            alert("密码不能为空");
+            return;
+        }
+        if ($("#phone").val() == "") {
+            alert("手机不能为空");
+            return;
+        }
+        $.post('/toReg', {
+            name: $("#name").val(),
+            password: $("#password").val(),
+            phone: $("#phone").val()
+        }, function (res) {
+            console.log(res);
+            if (res.code == 200) {
+                alert('注册成功');
+                localStorage.setItem('name', $("#name").val());
+                localStorage.setItem('token', res.token);
+                window.location.href = "/main"
+            } else {
+                alert('注册失败:' + res.msg);
+            }
+        }, "json")
+    });
+</script>
+</body>
+</html>

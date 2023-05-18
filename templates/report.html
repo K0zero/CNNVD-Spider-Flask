@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>report</title>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/echarts.4.3.0.min.js"></script>
+    <style>
+        .div1 {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-content: center;
+        }
+
+        .div1_1 {
+            display: flex;
+            background-color: #ffffff;
+            width: 24%;
+            margin-right: 1%;
+            justify-content: space-around;
+            align-content: center;
+            border-radius: 6px;
+        }
+
+        .div1_1 img {
+            width: 120px;
+            height: 120px;
+            display: block;
+        }
+
+        .div1_1_2 {
+            height: 50px;
+            line-height: 50px;
+            font-size: 14px;
+            color: #009688;
+        }
+
+        .div1_1_3 {
+            height: 60px;
+            line-height: 60px;
+            font-size: 30px;
+            font-weight: 500;
+            color: #009688;
+        }
+
+        #div2 {
+            width: 99%;
+            height: 400px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 6px;
+            padding-top: 20px;
+        }
+
+        #div3_1 {
+            height: 300px;
+            width: 32%;
+            margin-right: 1%;
+            background-color: white;
+            border-radius: 6px;
+            padding-top: 20px;
+        }
+
+        #div3_2 {
+            height: 300px;
+            width: 32%;
+            margin-right: 1%;
+            background-color: white;
+            border-radius: 6px;
+            padding-top: 20px;
+        }
+
+        #div3_3 {
+            height: 300px;
+            width: 32%;
+            margin-right: 1%;
+            background-color: white;
+            border-radius: 6px;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="div1">
+
+    <div class="div1_1">
+        <div><img src="/static/image/1.png"></div>
+        <div>
+            <div class="div1_1_2">用户数</div>
+            <div class="div1_1_3">{{ userNum }}</div>
+        </div>
+    </div>
+
+    <div class="div1_1">
+        <div><img src="/static/image/2.png"></div>
+        <div>
+            <div class="div1_1_2">漏洞数</div>
+            <div class="div1_1_3">{{ vulNum }}</div>
+        </div>
+    </div>
+
+    <div class="div1_1">
+        <div><img src="/static/image/3.png"></div>
+        <div>
+            <div class="div1_1_2">本月发布</div>
+            <div class="div1_1_3">{{ mNum }}</div>
+        </div>
+    </div>
+
+    <div class="div1_1">
+        <div><img src="/static/image/4.png"></div>
+        <div>
+            <div class="div1_1_2">今日发布</div>
+            <div class="div1_1_3">{{ dNum }}</div>
+        </div>
+    </div>
+</div>
+
+<div id="div2">
+
+</div>
+
+<div class="div1">
+
+    <div id="div3_1"></div>
+
+    <div id="div3_2"></div>
+
+    <div id="div3_3"></div>
+
+</div>
+
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('div2'));
+    // 处理数据
+    var dateList = {{ dateList|tojson }};
+    var xAxisData = [];
+    var OF1Data = [];
+    for (var i = 0; i < dateList.length; i++) {
+        xAxisData.push(dateList[i].date);
+        OF1Data.push(dateList[i].num);
+    }
+
+    // 配置项
+    var option = {
+        title: {
+            text: '每月漏洞数',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        // legend: {
+        // data: ['发布数']
+        //  },
+        xAxis: {
+            type: 'category',
+            data: xAxisData,
+            axisLine: {
+                lineStyle: {
+                    color: '#2bd1f8'
+                }
+            },
+            axisLabel: {
+                color: '#2bd1f8',
+                interval: 0
+            }
+        },
+        yAxis: {
+            type: 'value',
+            axisLine: {
+                lineStyle: {
+                    color: '#2bd1f8'
+                }
+            },
+            axisLabel: {
+                color: '#2bd1f8',
+                interval: 0
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(43,209,248,0.58)',
+                    type: 'dashed'
+                }
+            }
+        },
+        series: [
+
+            {
+                name: '发布数',
+                type: 'line',
+                data: OF1Data,
+                lineStyle: {
+                    color: '#ee00ff'
+                }
+            }
+        ]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart31 = echarts.init(document.getElementById('div3_1'));
+    // 配置项
+    option = {
+        title: {
+            text: '危害等级',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        color: ['#5470c6', '#91cd77', '#d1f538', '#3ca170'],
+        series: [
+            {
+                name: '危害等级',
+                type: 'pie',
+                radius: '50%',
+                data:  {{ 危害等级List|tojson }},
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart31.setOption(option);
+
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart32 = echarts.init(document.getElementById('div3_2'));
+    // 配置项
+    option = {
+        title: {
+            text: '漏洞类型',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        /*
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+         */
+        color: ['#7100a6', '#08efe7', '#3ca170', '#5470c6', '#91cd77'],
+        series: [
+            {
+                name: '漏洞类型',
+                type: 'pie',
+                radius: '50%',
+                data:{{ 漏洞类型List|tojson }},
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart32.setOption(option);
+
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart33 = echarts.init(document.getElementById('div3_3'));
+    // 配置项
+    option = {
+        title: {
+            text: '威胁类型',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        color: ['#cb01e7', '#91cd77', '#77ff56', '#2581e7', '#3ca170'],
+        series: [
+            {
+                name: '威胁类型',
+                type: 'pie',
+                radius: '50%',
+                data: {{ 威胁类型List|tojson }},
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    // 使用刚指定的配置项和数据显示图表。
+    myChart33.setOption(option);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <style>
+        table {
+            width: 100%;
+            font-size: 12px;
+            background-color: white;
+            border-bottom: 1px solid lightgray;
+            border-collapse: collapse;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        tr:hover {
+            background-color: rgb(242, 242, 242);
+        }
+
+        th {
+            border-bottom: 1px solid lightgray;
+        }
+
+        td {
+            border-bottom: 1px solid lightgray;
+        {#width: 200px !important;#} text-align: center;
+            line-height: 40px;
+            height: 40px;
+            padding: 4px 10px;
+        }
+
+        .searchDiv {
+            background-color: white;
+            font-size: 12px;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        input[type='text'] {
+            height: 27px;
+            margin-left: 10px;
+            margin-right: 10px;
+            border-color: rgba(153, 153, 153, 0.11);
+            border-radius: 4px;
+        }
+
+        input[type='button'] {
+            border-color: transparent;
+            padding: 6px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        input[type='checkbox'] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        #page {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            padding: 10px;
+        }
+
+        .pageDiv {
+            margin: 6px;
+            border: 1px solid rgba(153, 153, 153, 0.65);
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .selected {
+            color: #ffffff;
+            background: #4672ff;
+            cursor: default;
+        }
+
+        .zhezhao {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #00000020;
+            top: 0px;
+            left: 0px;
+            display: none;
+        }
+
+        .valDiv {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+        {#height: 80%;#} background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div>
+    <div class="searchDiv">
+        <div>账号：</div>
+        <input id="nameTxt" type="text" style="">
+        <div>手机：</div>
+        <input id="phoneTxt" type="text" style="">
+
+        <div>注册日期：</div>
+        <input id="time1" class="inputTime" type="text" style="">至<input id="time2" class="inputTime" type="text"
+                                                                          style="">
+        <input type="button" value="搜索" style="background-color: rgb(10,190,150);border-radius: 10px;"
+               onclick="toPage(1)"/>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <input id="addBtn" type="button" value="手动添加" style="background-color: rgb(90,180,130);"/>
+        <input id="plDelBtn" type="button" value="批量删除" style="background-color: rgb(250,150,150);"/>
+    </div>
+
+    <table>
+        <tr style="background-color: rgba(153,153,153,0.6);color:#ffffff;">
+            <td nowrap>ID</td>
+            <td nowrap>账号</td>
+            <td nowrap>手机</td>
+            <td nowrap>密码</td>
+            <td nowrap>角色</td>
+            <td nowrap>注册时间</td>
+            <td nowrap>操作</td>
+        </tr>
+        <tr id="trVal"></tr>
+
+    </table>
+
+    <div id="page"></div>
+</div>
+
+
+<div id="detailDiv" class="zhezhao">
+    <div id="detailDiv2" class="valDiv">
+        <table>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">ID:</td>
+                <td id="td_id"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">账号:</td>
+                <td id="td_name"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">手机:</td>
+                <td id="td_phone"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">密码:</td>
+                <td id="td_password"></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">角色:</td>
+                <td id="td_admin"></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">注册时间:</td>
+                <td id="td_addTime"></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <input id="closeDetailDiv" type="button" value="关闭" style="background-color: #999999"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div id="editDiv" class="zhezhao">
+    <div id="editDiv2" class="valDiv">
+        <table>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">ID:</td>
+                <td style="text-align: left;"><input id="id" type="text" placeholder="新增不需要填"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">账号:</td>
+                <td style="text-align: left;"><input id="name" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">手机:</td>
+                <td style="text-align: left;"><input id="phone" type="text"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">密码:</td>
+                <td style="text-align: left;"><input id="password" type="text"/></td>
+            </tr>
+            <tr>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">角色:</td>
+                <td style="text-align: left;"><input id="admin" type="text" placeholder="管理员1，普通会员0"/></td>
+                <td style="background-color: rgba(153,153,153,0.6);color:#ffffff;">注册时间:</td>
+                <td style="text-align: left;"><input id="addTime" class="inputTime" type="text"/></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <input id="editBtn" type="button" value="修改" style="background-color: rgb(22,130,160);"/>
+                    <input id="closeEditDiv" type="button" value="关闭" style="background-color: #999999"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $(".inputTime").datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+        toPage(1);
+    });
+
+    function setPage(page, pageSize, count) {
+        //总记录数大于pageSize的时候显示分页
+        if (count > pageSize) {
+            var html = "";
+            // 首页设置
+            if (page > 1) {
+                if (count / pageSize > 2) {
+                    html += "<div class='pageDiv' onclick='toPage(1)'>首页</div>";
+                }
+                html += "<div class='pageDiv' onclick='toPage(" + (page - 1) + ")'>上一页</div>";
+            }
+            // 当前页
+            html += "<div class='pageDiv selected'>" + page + "</div>";
+            // 后pageSize页
+            for (var i = page + 1, h = 1; i - 1 < count / pageSize && h < pageSize; i++, h++) {
+                html += "<div class='pageDiv' onclick='toPage(" + i + ")'>" + i + "</div>";
+            }
+            //尾页设置
+            if (page < count / pageSize) {
+                var lastPage = parseInt(count / pageSize) + 1;
+                html += "<div class='pageDiv' onclick='toPage(" + lastPage + ")'>尾页</div>";
+            }
+            $("#page").html(html);
+        } else {
+            $("#page").html("<div class='pageDiv selected'>1</div>");
+        }
+        $("#page").html($("#page").html() + "<div class='pageDiv'>每页 " + pageSize + " 行,共 " + count + " 行</div>");
+    }
+
+    function toPage(page) {
+        var name = $("#nameTxt").val();
+        var phone = $("#phoneTxt").val();
+        var time1 = $("#time1").val();
+        var time2 = $("#time2").val();
+        var pageSize = 12;
+        $.post("/getUserList", {
+            name: name, phone: phone, time1: time1, time2: time2, page: page, pageSize: pageSize
+        }, (res) => {
+            console.log(res);
+
+            $(".trOrther").remove();
+            for (var i = 0; i < res.data.list.length; i++) {
+                var one = res.data.list[i];
+
+                html = ' <tr class="trOrther">' +
+                    '<td nowrap>' +
+                    '<input id="ids" name="ids" type="checkbox" value="' + one.id + '"/>' + one.id + '</td>' +
+                    '<td nowrap>' + one.name + '</td>' +
+                    '<td nowrap>' + one.phone + '</td>' +
+                    '<td nowrap>' + one.password + '</td>' +
+                    '<td nowrap>' + (one.admin == 1 ? '管理员' : '普通会员') + '</td>' +
+                    '<td nowrap>' + one.addTime + '</td>' +
+                    '<td>' +
+                    '  <input onclick="detail(' + one.id + ')" type="button" value="详情" style="background-color: rgb(0,209,190);"/>' +
+                    '  <input onclick="edit(' + one.id + ')" type="button" value="修改" style="background-color: rgb(22,130,160);"/>' +
+                    '  <input onclick="deleteFun(' + one.id + ')" type="button" value="删除" style="background-color: rgb(250,150,150);"/>' +
+                    '</td>' +
+                    '</tr>';
+
+                $("#trVal").before(html);
+            }
+
+            setPage(res.data.page, pageSize, res.data.count);
+        }, "json")
+    }
+
+    $("#plDelBtn").on('click', function () {
+        var ids = "";
+        $("input[name='ids']:checked").each(function () {
+            ids += "," + $(this).val();
+        });
+        if (ids != "") {
+            ids = ids.substring(1);
+        }
+        deleteFun(ids);
+    });
+
+
+    function deleteFun(ids) {
+        if (ids == "") {
+            alert("请选择记录");
+            return;
+        }
+        if (confirm("确定要删除？")) {
+            $.post("/delUser", {ids: ids}, (res) => {
+                alert("删除成功");
+                toPage(1);
+            }, "json");
+        }
+    }
+
+    $("#addBtn").on('click', function () {
+        $("#editDiv").show();
+        $("#id").val("");
+        $("#name").val("");
+        $("#phone").val("");
+        $("#password").val("");
+        $("#admin").val("");
+        $("#addTime").val("");
+        $("#editBtn").val("新增")
+    });
+
+    function edit(id) {
+        $("#editDiv").show();
+        $.post("/getUser", {id: id}, (res) => {
+            console.log(res);
+            var one = res.data;
+            $("#id").val(one.id);
+            $("#name").val(one.name);
+            $("#phone").val(one.phone);
+            $("#password").val(one.password);
+            $("#admin").val(one.admin);
+            $("#addTime").val(one.addTime);
+            $("#editBtn").val("修改")
+        }, "json");
+    }
+
+    $("#editBtn").on('click', function () {
+        var id = $("#id").val();
+        var name = $("#name").val();
+        var phone = $("#phone").val();
+        var password = $("#password").val();
+        var admin = $("#admin").val();
+        var addTime = $("#addTime").val();
+        if (id == "") {
+            id = 0;
+        }
+        $.post("/addOrEditUser", {
+                id: id,
+                name: name,
+                phone: phone,
+                password: password,
+                admin: admin,
+                addTime: addTime
+            }, (res) => {
+                if (id > 0) {
+                    alert("修改成功");
+                } else {
+                    alert("新增成功");
+                }
+                toPage(1);
+                $("#editDiv").hide();
+            }, "json"
+        );
+    });
+
+    $("#closeEditDiv").on('click', function () {
+        $("#editDiv").hide();
+    });
+
+    function detail(id) {
+        $("#detailDiv").show();
+        $.post("/getUser", {id: id}, (res) => {
+            console.log(res);
+            var one = res.data;
+            $("#td_id").html(one.id);
+            $("#td_name").html(one.name);
+            $("#td_phone").html(one.phone);
+            $("#td_password").html(one.password);
+            $("#td_admin").html(one.admin);
+            $("#td_addTime").html(one.addTime);
+        }, "json");
+    }
+
+    $("#closeDetailDiv").on('click', function () {
+        $("#detailDiv").hide();
+    });
+
+
+</script>
+</body>
+</html>
